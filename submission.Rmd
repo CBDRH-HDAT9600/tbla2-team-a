@@ -1,8 +1,8 @@
 ---
 title: "HDAT9600 Team Based Learning Activity"
 subtitle: "TBLA 2. Linear model"
-author: "A. Student"
-date: "01/01/1990"
+author: "Team A/The Outliers - Melvin Galera, Peter Nguyen, Melissa Weerappah, Kevin Qlintang"
+date: "22 February 2022"
 output: html_document
 ---
 
