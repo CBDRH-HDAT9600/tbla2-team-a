@@ -8,6 +8,9 @@ output: html_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+
+library(tidyverse)
+library(cowplot)
 ```
 
 ## Instructions
@@ -37,3 +40,128 @@ Try entering `?faraway::prostate` at the console to get more information about t
 ## Submission
 
 Work with your group to add your analysis to this file using appropriate Rmarkdown formatting and R code chunks. Add and commit your changes as you go. Once you are ready, push all your changes to submit. If necessary, check out the introductory tutorials on knitr and git. 
+
+## Solution
+
+### A. Exploratory Data Analysis
+
+In this section, we access the data and perform simple exploratory data analysis.
+
+```{r}
+str(prostate)
+summary(prostate)
+
+# Check for missing values
+
+sum(is.na(prostate))
+
+# Check variables with integer data type - svi, gleason and pgg45
+unique(prostate$svi)
+unique(prostate$gleason)
+unique(prostate$pgg45)
+
+# Convert svi and gleason to factors
+prostate$svi <- as.factor(prostate$svi)
+prostate$gleason <- as.factor(prostate$gleason)
+
+summary(prostate)
+```
+* The `prostate` data set contains 97 observations and 9 variables. All the variables are numeric.
+* There are no missing values in the data set.
+
+### Univariate Summaries
+
+```{r echo = FALSE, warning = FALSE, message = FALSE}
+
+lpsa_plot <- ggplot(data = prostate, aes(x = lpsa)) + 
+              geom_histogram(color = 'skyblue4', fill = 'skyblue2') +
+              scale_y_continuous(breaks = seq(0, 16, 2), lim = c(0, 16), expand = c(0, 0))
+
+lcavol_plot <- ggplot(data = prostate, aes(x = lcavol)) + 
+                geom_histogram(color = 'skyblue4', fill = 'skyblue2') +
+                scale_y_continuous(breaks = seq(0, 16, 2), lim = c(0, 16), expand = c(0, 0))
+
+lweight_plot <- ggplot(data = prostate, aes(x=lweight)) + 
+                geom_histogram(color = 'skyblue4', fill = 'skyblue2') +
+                scale_y_continuous(breaks = seq(0, 16, 2), lim = c(0, 16), expand = c(0, 0))
+
+lbph_plot <- ggplot(data = prostate, aes(x=lbph)) + 
+                geom_histogram(color = 'skyblue4', fill = 'skyblue2') +
+                scale_y_continuous(breaks = seq(0, 16, 2), lim = c(0, 16), expand = c(0, 0))
+
+age_plot <- ggplot(data = prostate, aes(x=age)) + 
+                geom_histogram(color = 'skyblue4', fill = 'skyblue2') +
+                scale_y_continuous(breaks = seq(0, 16, 2), lim = c(0, 16), expand = c(0, 0))
+
+lcp_plot <- ggplot(data = prostate, aes(x=lcp)) + 
+                geom_histogram(color = 'skyblue4', fill = 'skyblue2') +
+                scale_y_continuous(breaks = seq(0, 16, 2), lim = c(0, 16), expand = c(0, 0))
+
+pgg45_plot <- ggplot(data = prostate, aes(x=pgg45)) + 
+                geom_histogram(color = 'skyblue4', fill = 'skyblue2') +
+                scale_y_continuous(breaks = seq(0, 16, 2), lim = c(0, 16), expand = c(0, 0))
+
+svi_plot <- ggplot(data = prostate, aes(x = svi)) +
+                geom_bar(color = 'goldenrod4', fill = 'goldenrod2', width = 0.5) +
+                scale_y_continuous(breaks = seq(0, 80, 10))
+
+gleason_plot <- ggplot(data = prostate, aes(x = gleason)) +
+                geom_bar(color = 'goldenrod4', fill = 'goldenrod2', width = 0.7) +
+                scale_y_continuous(breaks = seq(0, 60, 10))
+
+
+
+plot_grid(lpsa_plot, lcavol_plot, lweight_plot, lbph_plot, nrow = 2, ncol = 2)
+
+
+plot_grid(age_plot, lcp_plot, pgg45_plot, nrow = 2, ncol = 2)
+
+plot_grid(svi_plot, gleason_plot, nrow = 1, ncol = 2)
+```
+
+### Bivariate Summaries 
+
+```{r echo = FALSE, warning = FALSE, message = FALSE}
+p1 <- ggplot(prostate, aes(lcavol, lpsa)) +
+      geom_point(color = 'black', size = 2) 
+
+p2 <- ggplot(prostate, aes(lweight, lpsa)) +
+      geom_point(color = 'green4', size = 2)
+
+p3 <- ggplot(prostate, aes(lbph, lpsa)) +
+      geom_point(color = 'coral1', size = 2)
+
+p4 <- ggplot(prostate, aes(age, lpsa)) +
+      geom_point(color = 'red3', size = 2)
+
+p4 <- ggplot(prostate, aes(age, lpsa)) +
+      geom_point(color = 'red3', size = 2)
+
+p5 <- ggplot(prostate, aes(lcp, lpsa)) +
+      geom_point(color = 'goldenrod3', size = 2)
+
+p6 <- ggplot(prostate, aes(pgg45, lpsa)) +
+      geom_point(color = 'orchid4', size = 2)
+
+p7 <- ggplot(prostate, aes(svi, lpsa, fill = svi)) +
+      geom_boxplot(alpha = 0.3) +
+      theme(legend.position = "none")
+
+p8 <- ggplot(prostate, aes(gleason, lpsa, fill = gleason)) +
+      geom_boxplot(alpha = 0.3) +
+      theme(legend.position = "none")
+
+plot_grid(p1, p2, p3, p4, 
+          labels = c('lpsa vs. lcavol', 'lpsa vs. lweight', 'lpsa vs. lbph', 'lpsa vs. age'),
+          label_size = 10, 
+          nrow = 2, ncol = 2)
+
+plot_grid(p5, p6, p7, p8, 
+          labels = c('lpsa vs. lcp', 'lpsa vs. pgg45', 'lpsa vs. svi', 'lpsa vs. gleason'),
+          label_size = 10, 
+          nrow = 2, ncol = 2)
+
+```
+
+
+
