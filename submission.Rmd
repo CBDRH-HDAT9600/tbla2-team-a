@@ -229,16 +229,6 @@ mod1_RSE <- summary(mod1)$sigma
 ```{r echo = FALSE}
 # create a simple dataframe to display the R-squared RSE values for the linear model
 
-modelnum <- c('LM 2', 'LM 3', 'LM 4', 'LM 5', 'LM 6', 'LM 7', 'LM 8')
-
-pred_vars <- c('lcavol + lweight',
-               'lcavol + lweight + svi',
-               'lcavol + lweight + svi + lbph',
-               'lcavol + lweight + svi + lbph + age',
-               'lcavol + lweight + svi + lbph + age + lcp', 
-               'lcavol + lweight + svi + lbph + age + lcp + pgg45',
-               'lcavol + lweight + svi + lbph + age + lcp + pgg45 + gleason')
-
 
 r2_RSE_mod1 <- data.frame("Linear Model" = 'LM 1',
                            "Predictor Variable" = 'lcavol',
@@ -299,7 +289,7 @@ mod_list <- list(
 ***
 <br>
 
-#### 5. Displays the R-squared and RSE for each of these models
+#### 5. Display the R-squared and RSE for each of these models
 
 * We can use create functions to obtain the adjusted R-squared values and the residual standard errors (RSE) from the `mod_list`.
 Note that we are extracting the adjusted R-squared because we are building linear regression on multiple variables.
