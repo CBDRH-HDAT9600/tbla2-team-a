@@ -12,7 +12,7 @@ knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
 library(cowplot)
 library(kableExtra)
-library(GGally)
+
 ```
 
 ## Instructions
@@ -45,16 +45,30 @@ Try entering `?faraway::prostate` at the console to get more information about t
 
 Work with your group to add your analysis to this file using appropriate Rmarkdown formatting and R code chunks. Add and commit your changes as you go. Once you are ready, push all your changes to submit. If necessary, check out the introductory tutorials on knitr and git. 
 
+<br>
+
 ## Solution
 
-### 1. Exploratory Data Analysis
+<br>
 
-In this section, we access the data and perform simple exploratory data analysis.
+#### 1. Exploratory Data Analysis
 
-```{r fig.align='center', fig.width=10, fig.height=10}
+* In this section, we perform simple exploratory data analysis on the `prostate` dataset.
+
+a. To see the summary statistics for each variable in the `prostate` dataset:
+
+
+```{r}
 str(prostate)
+
 summary(prostate)
 
+```
+
+* The `prostate` data set contains 97 observations and 9 variables. All the variables are numeric.
+
+
+```{r include = FALSE }
 # Check for missing values
 
 sum(is.na(prostate))
@@ -70,44 +84,92 @@ prostate$gleason <- as.factor(prostate$gleason)
 
 summary(prostate)
 
-ggpairs(prostate, columns = 1:9, aes(color = svi, alpha = 0.5),
-        upper = list(continuous = wrap("cor", size = 2.5)))
 ```
 
-<br>
-
-* The `prostate` data set contains 97 observations and 9 variables. All the variables are numeric.
 * There are no missing values in the data set.
 
 <br>
 
-#### Univariate Summaries
+##### _Univariate Summaries_
 
 <br>
 
-#### Bivariate Summaries 
+```{r echo = FALSE, fig.align='center', fig.width=10, fig.height=8, message = FALSE}
 
-```{r echo = FALSE, warning = FALSE, message = FALSE}
+lpsa_plot <- ggplot(prostate, aes(x = lpsa)) + 
+            geom_histogram(fill = 'salmon2') +
+            labs(title = "lpsa distribution")
+  
+lcavol_plot <- ggplot(prostate, aes(x = lcavol)) + 
+            geom_histogram(fill = 'salmon2') +
+            labs(title = "lcavol distribution")
+
+lweight_plot <- ggplot(prostate, aes(x = lweight)) + 
+            geom_histogram(fill = 'salmon2') +
+            labs(title = "lweight distribution")
+
+lbph_plot <- ggplot(prostate, aes(x = lbph)) + 
+            geom_histogram(fill = 'salmon2') +
+            labs(title = "lweight distribution")
+
+age_plot <- ggplot(prostate, aes(x = age)) + 
+            geom_histogram(fill = 'salmon2') +
+            labs(title = "age distribution")
+
+lcp_plot <- ggplot(prostate, aes(x = lcp)) + 
+            geom_histogram(fill = 'salmon2') +
+            labs(title = "lcp distribution")
+
+pgg45_plot <- ggplot(prostate, aes(x = pgg45)) + 
+            geom_histogram(fill = 'salmon2') +
+            labs(title = "pgg45 distribution")
+
+svi_plot <- ggplot(prostate, aes(x = svi)) +
+            geom_bar(fill = 'salmon2', width = 0.5) +
+            labs(title = "svi distribution") 
+
+gleason_plot <- ggplot(prostate, aes(x = gleason)) +
+            geom_bar(fill = 'salmon2', width = 0.5) +
+            labs(title = "gleason distribution") 
+
+
+plot_grid(lpsa_plot, lcavol_plot, lweight_plot, 
+          lbph_plot, age_plot, lcp_plot, 
+          pgg45_plot, svi_plot, gleason_plot, nrow = 3, ncol = 3)
+```
+
+<br>
+
+##### _Bivariate Summaries_ 
+
+```{r echo = FALSE, fig.align='center', fig.width=8, fig.height=6, message = FALSE}
 p1 <- ggplot(prostate, aes(lcavol, lpsa)) +
-      geom_point(color = 'black', size = 2) 
+      geom_point(color = 'black', size = 2) + 
+      geom_smooth(method = 'lm', se = FALSE, lwd = 0.5)
 
 p2 <- ggplot(prostate, aes(lweight, lpsa)) +
-      geom_point(color = 'green4', size = 2)
+      geom_point(color = 'green4', size = 2)+ 
+      geom_smooth(method = 'lm', se = FALSE, lwd = 0.5)
 
 p3 <- ggplot(prostate, aes(lbph, lpsa)) +
-      geom_point(color = 'coral1', size = 2)
+      geom_point(color = 'coral1', size = 2)+ 
+      geom_smooth(method = 'lm', se = FALSE, lwd = 0.5)
 
 p4 <- ggplot(prostate, aes(age, lpsa)) +
-      geom_point(color = 'red3', size = 2)
+      geom_point(color = 'red3', size = 2)+ 
+      geom_smooth(method = 'lm', se = FALSE, lwd = 0.5)
 
 p4 <- ggplot(prostate, aes(age, lpsa)) +
-      geom_point(color = 'red3', size = 2)
+      geom_point(color = 'red3', size = 2)+ 
+      geom_smooth(method = 'lm', se = FALSE, lwd = 0.5)
 
 p5 <- ggplot(prostate, aes(lcp, lpsa)) +
-      geom_point(color = 'goldenrod3', size = 2)
+      geom_point(color = 'goldenrod3', size = 2)+ 
+      geom_smooth(method = 'lm', se = FALSE, lwd = 0.5)
 
 p6 <- ggplot(prostate, aes(pgg45, lpsa)) +
-      geom_point(color = 'orchid4', size = 2)
+      geom_point(color = 'orchid4', size = 2)+ 
+      geom_smooth(method = 'lm', se = FALSE, lwd = 0.5)
 
 p7 <- ggplot(prostate, aes(svi, lpsa, fill = svi)) +
       geom_boxplot(alpha = 0.3) +
@@ -119,12 +181,12 @@ p8 <- ggplot(prostate, aes(gleason, lpsa, fill = gleason)) +
 
 plot_grid(p1, p2, p3, p4, 
           labels = c('lpsa vs. lcavol', 'lpsa vs. lweight', 'lpsa vs. lbph', 'lpsa vs. age'),
-          label_size = 10, 
+          label_size = 12, 
           nrow = 2, ncol = 2)
 
 plot_grid(p5, p6, p7, p8, 
           labels = c('lpsa vs. lcp', 'lpsa vs. pgg45', 'lpsa vs. svi', 'lpsa vs. gleason'),
-          label_size = 10, 
+          label_size = 12, 
           nrow = 2, ncol = 2)
 
 ```
@@ -133,7 +195,7 @@ plot_grid(p5, p6, p7, p8,
 ***
 <br>
 
-##### 2. Fit a linear model, with the `lpsa` variable as the outcome (response), and the `lcavol` variable as the single predictor
+#### 2. Fit a linear model, with the `lpsa` variable as the outcome (response), and the `lcavol` variable as the single predictor
 
 * The linear model equation will be: 
 <br/>
@@ -153,7 +215,7 @@ mod1 <- lm(lpsa ~ lcavol, data = prostate)
 ***
 <br> 
 
-##### 3. Display the R-squared and the residual standard error (RSE) for this model
+#### 3. Display the R-squared and the residual standard error (RSE) for this model
 
 
 ```{r}
@@ -339,13 +401,18 @@ ggplot(data = df_mod, aes(x = linear_model, y = RSE)) +
 
 ```
 
+***
+<br>
+
+#### 7. Briefly describe observations in the plots
+
+##### _Plot 1: R-squared vs Linear Model_s_
 
 
 
+<br>
 
-
-
-
+##### _Plot 1: R-squared vs Linear Model_s_
 
 
 
