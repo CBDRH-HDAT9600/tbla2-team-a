@@ -2,7 +2,7 @@
 title: "HDAT9600 Team Based Learning Activity"
 subtitle: "TBLA 2. Linear model"
 author: "Team A/The Outliers - Melvin Galera, Peter Nguyen, Melissa Weerappah, Kevin Qlintang"
-date: "25 February 2022"
+date: "27 February 2022"
 output: html_document
 ---
 
@@ -53,7 +53,7 @@ Work with your group to add your analysis to this file using appropriate Rmarkdo
 
 #### 1. Exploratory Data Analysis
 
-* In this section, we perform simple exploratory data analysis on the `prostate` dataset.
+* In this section, we performed a simple exploratory data analysis on the `prostate` dataset.
 
 a. To see the summary statistics for each variable in the `prostate` dataset:
 
@@ -64,6 +64,8 @@ str(prostate)
 summary(prostate)
 
 ```
+
+*Remarks:*
 
 * The `prostate` data set contains 97 observations and 9 variables. All the variables are numeric.
 
@@ -110,7 +112,7 @@ lweight_plot <- ggplot(prostate, aes(x = lweight)) +
 
 lbph_plot <- ggplot(prostate, aes(x = lbph)) + 
             geom_histogram(fill = 'salmon2') +
-            labs(title = "lweight distribution")
+            labs(title = "lbph distribution")
 
 age_plot <- ggplot(prostate, aes(x = age)) + 
             geom_histogram(fill = 'salmon2') +
@@ -137,6 +139,17 @@ plot_grid(lpsa_plot, lcavol_plot, lweight_plot,
           lbph_plot, age_plot, lcp_plot, 
           pgg45_plot, svi_plot, gleason_plot, nrow = 3, ncol = 3)
 ```
+
+*Remarks:*
+
+* The log of prostate specific antigen (`lpsa`) is normally distributed with mean of 2.48 and a range from -0.43 to 5.58. 
+* The log of cancer volume (`lcavol`) is normally distributed with mean of 1.35 and a range from -1.35 to 3.82.
+* The log of prostate weight (`lweight`) is normally distributed with mean of 3.65 and a range from 2.38 to 6.11.
+* The `age` is normally distributed with mean of 64 and a range from 41 to 79. 
+Among the 97 observations, 76 have seminal vesicle invasion (`svi`) indicator of 0 and 21 have indicator of 1.
+* Among the 97 observations, 35 have a `gleason` score of 6, 56 have a `gleason` score of 7, one has a `gleason` score of 8, and 5 have a `gleason` score of 9. 
+* The log of benign prostatic hyperplasia amount (`lbph`), the log of capsular penetration (`lcp`) and the percentage Gleasons scores 4 or 5 (`pgg45`) are not normally distributed.
+
 
 <br>
 
@@ -190,6 +203,17 @@ plot_grid(p5, p6, p7, p8,
           nrow = 2, ncol = 2)
 
 ```
+
+*Remarks:*
+
+* There is a positive association between `lpsa` and `lcavol`. The correlation between the two variables was `r round(cor(prostate$lpsa, prostate$lcavol, use = 'complete.obs'), digits = 2)`.
+* There seems to be low positive association between `lpsa` and the other variables on the scatter point plots.
+1) For `lpsa` and `lweight`- the correlation was `r round(cor(prostate$lpsa, prostate$lweight, use = 'complete.obs'), digits = 2)`.
+1) For `lpsa` and `lbph` - the correlation was `r round(cor(prostate$lpsa, prostate$lbph, use = 'complete.obs'), digits = 2)`.
+1) For `lpsa` and `age` - the correlation was `r round(cor(prostate$lpsa, prostate$age, use = 'complete.obs'), digits = 2)`.
+1) For `lpsa` and `lcp` - the correlation was `r round(cor(prostate$lpsa, prostate$lcp, use = 'complete.obs'), digits = 2)`.
+1) For `lpsa` and `pgg45` - the correlation was `r round(cor(prostate$lpsa, prostate$pgg45, use = 'complete.obs'), digits = 2)`.
+* There are more `svi` having a ‘1’ indicator at higher `lpsa` values compared to `svi` having an indicator of ‘0’. 
 
 
 ***
@@ -291,7 +315,7 @@ mod_list <- list(
 
 #### 5. Display the R-squared and RSE for each of these models
 
-* We can use create functions to obtain the adjusted R-squared values and the residual standard errors (RSE) from the `mod_list`.
+* We can create functions to obtain the adjusted R-squared values and the residual standard errors (RSE) from the `mod_list`.
 Note that we are extracting the adjusted R-squared because we are building linear regression on multiple variables.
 
 ```{r}
@@ -398,12 +422,13 @@ ggplot(data = df_mod, aes(x = linear_model, y = RSE)) +
 
 ##### _Plot 1: R-squared vs Linear Model_s_
 
+* With every addition of predictor variable to the model, the R-squared value increased up to a certain value before plateauing. After LM 3 (`lpsa ~ lcavol + lweight + svi`), there were very small changes in the R-squared  values. 
 
 
 <br>
 
-##### _Plot 1: R-squared vs Linear Model_s_
+##### _Plot 2: R-squared vs Linear Model_s_
 
-
+* On the other hand, the opposite trend was observed with RSE. With every addition of predictor variable to the model, the RSE value decreased to a certain value before plateauing. Also, after LM 3 (`lpsa ~ lcavol + lweight + svi`), very small changes in the RSE  values observed. 
 
 
