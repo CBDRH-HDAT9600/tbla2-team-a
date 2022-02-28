@@ -37,3 +37,11 @@ Try entering `?faraway::prostate` at the console to get more information about t
 ## Submission
 
 Work with your group to add your analysis to this file using appropriate Rmarkdown formatting and R code chunks. Add and commit your changes as you go. Once you are ready, push all your changes to submit. If necessary, check out the introductory tutorials on knitr and git. 
+
+## Question 2 
+``` {r} 
+
+(mod1 <- lm(lpsa ~ lcavol, data = prostate))
+
+
+```
