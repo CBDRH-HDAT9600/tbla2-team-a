@@ -2,12 +2,16 @@
 title: "HDAT9600 Team Based Learning Activity"
 subtitle: "TBLA 2. Linear model"
 author: "Team A/The Outliers - Melvin Galera, Peter Nguyen, Melissa Weerappah, Kevin Qlintang"
-date: "22 February 2022"
 output: html_document
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+
+library(tidyverse)
+library(cowplot)
+library(kableExtra)
+
 ```
 
 ## Instructions
@@ -30,6 +34,8 @@ We can use the `data()` function from the `utils` package to load the data into 
 ```{r}
 data(prostate, package = "faraway")
 head(prostate)
+
+
 ```
 
 Try entering `?faraway::prostate` at the console to get more information about this dataset. 
@@ -37,3 +43,391 @@ Try entering `?faraway::prostate` at the console to get more information about t
 ## Submission
 
 Work with your group to add your analysis to this file using appropriate Rmarkdown formatting and R code chunks. Add and commit your changes as you go. Once you are ready, push all your changes to submit. If necessary, check out the introductory tutorials on knitr and git. 
+
+<br>
+
+## Solution
+
+<br>
+
+#### 1. Exploratory Data Analysis
+
+* In this section, we performed a simple exploratory data analysis on the `prostate` dataset.
+
+a. To see the summary statistics for each variable in the `prostate` dataset:
+
+
+```{r}
+str(prostate)
+
+summary(prostate)
+
+```
+
+*Remarks:*
+
+* The `prostate` data set contains 97 observations and 9 variables. All the variables are numeric.
+
+
+```{r include = FALSE }
+# Check for missing values
+
+sum(is.na(prostate))
+
+# Check variables with integer data type - svi, gleason and pgg45
+unique(prostate$svi)
+unique(prostate$gleason)
+unique(prostate$pgg45)
+
+# Convert svi and gleason to factors
+prostate$svi <- as.factor(prostate$svi)
+prostate$gleason <- as.factor(prostate$gleason)
+
+summary(prostate)
+
+```
+
+* There are no missing values in the data set.
+
+<br>
+
+##### _Univariate Summaries_
+
+<br>
+
+```{r echo = FALSE, fig.align='center', fig.width=10, fig.height=8, message = FALSE}
+
+lpsa_plot <- ggplot(prostate, aes(x = lpsa)) + 
+            geom_histogram(fill = 'salmon2') +
+            labs(title = "lpsa distribution")
+  
+lcavol_plot <- ggplot(prostate, aes(x = lcavol)) + 
+            geom_histogram(fill = 'salmon2') +
+            labs(title = "lcavol distribution")
+
+lweight_plot <- ggplot(prostate, aes(x = lweight)) + 
+            geom_histogram(fill = 'salmon2') +
+            labs(title = "lweight distribution")
+
+lbph_plot <- ggplot(prostate, aes(x = lbph)) + 
+            geom_histogram(fill = 'salmon2') +
+            labs(title = "lbph distribution")
+
+age_plot <- ggplot(prostate, aes(x = age)) + 
+            geom_histogram(fill = 'salmon2') +
+            labs(title = "age distribution")
+
+lcp_plot <- ggplot(prostate, aes(x = lcp)) + 
+            geom_histogram(fill = 'salmon2') +
+            labs(title = "lcp distribution")
+
+pgg45_plot <- ggplot(prostate, aes(x = pgg45)) + 
+            geom_histogram(fill = 'salmon2') +
+            labs(title = "pgg45 distribution")
+
+svi_plot <- ggplot(prostate, aes(x = svi)) +
+            geom_bar(fill = 'salmon2', width = 0.5) +
+            labs(title = "svi distribution") 
+
+gleason_plot <- ggplot(prostate, aes(x = gleason)) +
+            geom_bar(fill = 'salmon2', width = 0.5) +
+            labs(title = "gleason distribution") 
+
+
+plot_grid(lpsa_plot, lcavol_plot, lweight_plot, 
+          lbph_plot, age_plot, lcp_plot, 
+          pgg45_plot, svi_plot, gleason_plot, nrow = 3, ncol = 3)
+```
+
+*Remarks:*
+
+* The log of prostate specific antigen (`lpsa`) is normally distributed with mean of 2.48 and a range from -0.43 to 5.58. 
+* The log of cancer volume (`lcavol`) is normally distributed with mean of 1.35 and a range from -1.35 to 3.82.
+* The log of prostate weight (`lweight`) is normally distributed with mean of 3.65 and a range from 2.38 to 6.11.
+* The `age` is normally distributed with mean of 64 and a range from 41 to 79. 
+Among the 97 observations, 76 have seminal vesicle invasion (`svi`) indicator of 0 and 21 have indicator of 1.
+* Among the 97 observations, 35 have a `gleason` score of 6, 56 have a `gleason` score of 7, one has a `gleason` score of 8, and 5 have a `gleason` score of 9. 
+* The log of benign prostatic hyperplasia amount (`lbph`), the log of capsular penetration (`lcp`) and the percentage Gleasons scores 4 or 5 (`pgg45`) are not normally distributed.
+
+
+<br>
+
+##### _Bivariate Summaries_ 
+
+```{r echo = FALSE, fig.align='center', fig.width=8, fig.height=6, message = FALSE}
+p1 <- ggplot(prostate, aes(lcavol, lpsa)) +
+      geom_point(color = 'black', size = 2) + 
+      geom_smooth(method = 'lm', se = FALSE, lwd = 0.5)
+
+p2 <- ggplot(prostate, aes(lweight, lpsa)) +
+      geom_point(color = 'green4', size = 2)+ 
+      geom_smooth(method = 'lm', se = FALSE, lwd = 0.5)
+
+p3 <- ggplot(prostate, aes(lbph, lpsa)) +
+      geom_point(color = 'coral1', size = 2)+ 
+      geom_smooth(method = 'lm', se = FALSE, lwd = 0.5)
+
+p4 <- ggplot(prostate, aes(age, lpsa)) +
+      geom_point(color = 'red3', size = 2)+ 
+      geom_smooth(method = 'lm', se = FALSE, lwd = 0.5)
+
+p4 <- ggplot(prostate, aes(age, lpsa)) +
+      geom_point(color = 'red3', size = 2)+ 
+      geom_smooth(method = 'lm', se = FALSE, lwd = 0.5)
+
+p5 <- ggplot(prostate, aes(lcp, lpsa)) +
+      geom_point(color = 'goldenrod3', size = 2)+ 
+      geom_smooth(method = 'lm', se = FALSE, lwd = 0.5)
+
+p6 <- ggplot(prostate, aes(pgg45, lpsa)) +
+      geom_point(color = 'orchid4', size = 2)+ 
+      geom_smooth(method = 'lm', se = FALSE, lwd = 0.5)
+
+p7 <- ggplot(prostate, aes(svi, lpsa, fill = svi)) +
+      geom_boxplot(alpha = 0.3) +
+      theme(legend.position = "none")
+
+p8 <- ggplot(prostate, aes(gleason, lpsa, fill = gleason)) +
+      geom_boxplot(alpha = 0.3) +
+      theme(legend.position = "none")
+
+plot_grid(p1, p2, p3, p4, 
+          labels = c('lpsa vs. lcavol', 'lpsa vs. lweight', 'lpsa vs. lbph', 'lpsa vs. age'),
+          label_size = 12, 
+          nrow = 2, ncol = 2)
+
+plot_grid(p5, p6, p7, p8, 
+          labels = c('lpsa vs. lcp', 'lpsa vs. pgg45', 'lpsa vs. svi', 'lpsa vs. gleason'),
+          label_size = 12, 
+          nrow = 2, ncol = 2)
+
+```
+
+*Remarks:*
+
+* There is a positive association between `lpsa` and `lcavol`. The correlation between the two variables was `r round(cor(prostate$lpsa, prostate$lcavol, use = 'complete.obs'), digits = 2)`.
+* There seems to be low positive association between `lpsa` and the other variables on the scatter point plots.
+1) For `lpsa` and `lweight`- the correlation was `r round(cor(prostate$lpsa, prostate$lweight, use = 'complete.obs'), digits = 2)`.
+1) For `lpsa` and `lbph` - the correlation was `r round(cor(prostate$lpsa, prostate$lbph, use = 'complete.obs'), digits = 2)`.
+1) For `lpsa` and `age` - the correlation was `r round(cor(prostate$lpsa, prostate$age, use = 'complete.obs'), digits = 2)`.
+1) For `lpsa` and `lcp` - the correlation was `r round(cor(prostate$lpsa, prostate$lcp, use = 'complete.obs'), digits = 2)`.
+1) For `lpsa` and `pgg45` - the correlation was `r round(cor(prostate$lpsa, prostate$pgg45, use = 'complete.obs'), digits = 2)`.
+* There are more `svi` having a ‘1’ indicator at higher `lpsa` values compared to `svi` having an indicator of ‘0’. 
+
+
+***
+<br>
+
+#### 2. Fit a linear model, with the `lpsa` variable as the outcome (response), and the `lcavol` variable as the single predictor
+
+* The linear model equation will be: 
+<br/>
+
+
+<div align = 'center'> _lpsa = $\beta_{0}$ + $\beta_{1}$lcavol + $\epsilon$_ </div>  
+<br/>
+
+
+* The R code to fit the model via OLS can be written as:
+
+```{r }
+mod1 <- lm(lpsa ~ lcavol, data = prostate)
+
+```
+
+***
+<br> 
+
+#### 3. Display the R-squared and the residual standard error (RSE) for this model
+
+
+```{r}
+
+mod1_R2 <- summary(mod1)$r.squared
+
+mod1_RSE <- summary(mod1)$sigma
+
+```
+
+```{r echo = FALSE}
+# create a simple dataframe to display the R-squared RSE values for the linear model
+
+
+r2_RSE_mod1 <- data.frame("Linear Model" = 'LM 1',
+                           "Predictor Variable" = 'lcavol',
+                           "R-Squared" = mod1_R2,
+                           "RSE" = mod1_RSE)
+
+# use kableExtra to display the dataframe
+
+kbl(r2_RSE_mod1, caption = "Linear Model (LM) with R-squared and Residual Standard Error (RSE) values") %>% kable_styling()
+```
+
+***
+<br>
+
+#### 4. Add each of the variables `lweight`, `svi`, `lbph`, `age`, `lcp`, `pgg45` and `gleason` to the model, one-by-one. 
+
+* The linear model equations will be: 
+<br/>
+
+* _lpsa = $\beta_{0}$ + $\beta_{1}$lcavol + $\beta_{2}$lweight + $\epsilon$_ 
+<br/>
+
+* _lpsa = $\beta_{0}$ + $\beta_{1}$lcavol + $\beta_{2}$lweight + $\beta_{3}$svi + $\epsilon$_ 
+<br/>
+
+* _lpsa = $\beta_{0}$ + $\beta_{1}$lcavol + $\beta_{2}$lweight + $\beta_{3}$svi + $\beta_{4}$lbph + $\epsilon$_
+<br/>
+
+* _lpsa = $\beta_{0}$ + $\beta_{1}$lcavol + $\beta_{2}$lweight + $\beta_{3}$svi + $\beta_{4}$lbph + $\beta_{5}$age + $\epsilon$_
+<br/>
+
+* _lpsa = $\beta_{0}$ + $\beta_{1}$lcavol + $\beta_{2}$lweight + $\beta_{3}$svi + $\beta_{4}$lbph + $\beta_{5}$age + $\beta_{6}$lcp + $\epsilon$_
+<br/>
+
+* _lpsa = $\beta_{0}$ + $\beta_{1}$lcavol + $\beta_{2}$lweight + $\beta_{3}$svi + $\beta_{4}$lbph + $\beta_{5}$age + $\beta_{6}$lcp + $\beta_{7}$pgg45 + $\epsilon$_  
+
+* _lpsa = $\beta_{0}$ + $\beta_{1}$lcavol + $\beta_{2}$lweight + $\beta_{3}$svi + $\beta_{4}$lbph + $\beta_{5}$age + $\beta_{6}$lcp + $\beta_{7}$pgg45 + $\beta_{8}$gleason + $\epsilon$_
+
+<br/>
+
+
+* The R code to fit the models via OLS can be written as a list. 
+
+```{r}
+
+#create a list of models
+mod_list <- list(
+    mod2 <- lm(lpsa ~ lcavol + lweight, data = prostate),
+    mod3 <- lm(lpsa ~ lcavol + lweight + svi, data = prostate),
+    mod4 <- lm(lpsa ~ lcavol + lweight + svi + lbph, data = prostate),
+    mod5 <- lm(lpsa ~ lcavol + lweight + svi + lbph + age, data = prostate),
+    mod6 <- lm(lpsa ~ lcavol + lweight + svi + lbph + age + lcp, data = prostate),
+    mod7 <- lm(lpsa ~ lcavol + lweight + svi + lbph + age + lcp + pgg45, data = prostate), 
+    mod8 <- lm(lpsa ~ lcavol + lweight + svi + lbph + age + lcp + pgg45 + gleason, data = prostate)
+   )
+```
+
+***
+<br>
+
+#### 5. Display the R-squared and RSE for each of these models
+
+* We can create functions to obtain the adjusted R-squared values and the residual standard errors (RSE) from the `mod_list`.
+Note that we are extracting the adjusted R-squared because we are building linear regression on multiple variables.
+
+```{r}
+
+# create functions to extract adjusted R-squared and RSE values from the list
+get_R2 <- function (x) {
+  summary(x)$adj.r.squared
+}
+
+get_RSE <- function (x) {
+  summary(x)$sigma
+}
+
+# use sapply function to get lists of R-squared and RSE values 
+r2_predictors <- sapply(mod_list, get_R2)
+RSE_predictors <- sapply(mod_list, get_RSE)
+```
+
+```{r echo = FALSE}
+
+# create a dataframe to display the R-squared RSE values for each linear model
+
+modelnum <- c('LM 2', 'LM 3', 'LM 4', 'LM 5', 'LM 6', 'LM 7', 'LM 8')
+
+pred_vars <- c('lcavol + lweight',
+               'lcavol + lweight + svi',
+               'lcavol + lweight + svi + lbph',
+               'lcavol + lweight + svi + lbph + age',
+               'lcavol + lweight + svi + lbph + age + lcp', 
+               'lcavol + lweight + svi + lbph + age + lcp + pgg45',
+               'lcavol + lweight + svi + lbph + age + lcp + pgg45 + gleason')
+
+
+r2_RSE_pred_vars <- data.frame("Linear Model" = modelnum,
+                           "Predictor Variables" = pred_vars,
+                           "R-Squared" = r2_predictors,
+                           "RSE" = RSE_predictors)
+
+# use kableExtra to display the dataframe
+
+kbl(r2_RSE_pred_vars, caption = "Linear Models (LM) with their R-squared (adjusted) and Residual Standard Errors (RSE) values") %>% kable_styling()
+
+```
+
+***
+<br>
+
+#### 6. Create two plots, one displaying the trend in R-squared as predictor variables are successively added to each model, and another plot showing the trend in RSE as predictor variables are successively added to each model
+
+
+```{r include = FALSE}
+# combine the dataframes created in from Tasks 2 and 4:
+
+df_mod <- data.frame(linear_model = append('LM 1', modelnum),
+                     Predictor_variables = append('lcavil', pred_vars),
+                     R_squared = append(mod1_R2, r2_predictors),
+                     RSE = append(mod1_RSE,RSE_predictors))
+df_mod
+
+```
+
+<br>
+
+##### _Plot 1: R-squared vs Linear Model_s_
+
+<br>
+
+```{r echo = FALSE, fig.align='center'}
+
+ggplot(data = df_mod, aes(x = linear_model, y = R_squared)) +
+  geom_point(color = "darkred", size = 2, shape = 4, stroke = 2) + 
+  labs(title = "R-squared values at different linear models (Prostate dataset)",
+       y = "R-squared values",
+       x = "Linear Models (see tables in tasks 3 & 5)",
+       caption = "Note: Used adjusted R-squared for LM 2 to LM 8") +
+  ylim(0.5, 0.7)
+
+
+```
+
+<br>
+
+##### _Plot 2: RSE vs Linear Models_
+
+<br> 
+
+```{r echo = FALSE, fig.align='center'}
+
+
+ggplot(data = df_mod, aes(x = linear_model, y = RSE)) +
+  geom_point(color = "navyblue", size = 2, shape = 4, stroke = 2) + 
+  labs(title = "Residual Standard Errors (RSE) at different linear models (Prostate dataset)",
+       y = "Residual Standard Errors (RSE)",
+       x = "Linear Models (see tables in tasks 3 & 5)") +
+  ylim(0.6, 0.85)
+
+
+```
+
+***
+<br>
+
+#### 7. Briefly describe observations in the plots
+
+##### _Plot 1: R-squared vs Linear Model_s_
+
+* With every addition of predictor variable to the model, the R-squared value increased up to a certain value before plateauing. After LM 3 (`lpsa ~ lcavol + lweight + svi`), there were very small changes in the R-squared  values. 
+
+
+<br>
+
+##### _Plot 2: R-squared vs Linear Model_s_
+
+* On the other hand, the opposite trend was observed with RSE. With every addition of predictor variable to the model, the RSE value decreased to a certain value before plateauing. Also, after LM 3 (`lpsa ~ lcavol + lweight + svi`), very small changes in the RSE  values observed. 
+
+
